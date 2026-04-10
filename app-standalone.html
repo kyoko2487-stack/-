@@ -1112,6 +1112,59 @@ select:focus {
         </main>
     </div>
 
-    <script src="script-20260410164416.js"></script>
+    <script>
+// --- 画像読み込みと保存の修正プログラム ---
+let currentImageData = ""; // 画像データを一時保存する変数
+
+const imageUpload = document.getElementById('imageUpload');
+const imagePreviews = document.getElementById('imagePreviews');
+const previewContainer = document.getElementById('imagePreviewContainer');
+
+// 1. 画像を選択した時に、iPhoneでも読み取れる形式に変換する
+imageUpload.onchange = (e) => {
+    const files = e.target.files;
+    imagePreviews.innerHTML = '';
+    previewContainer.style.display = 'block';
+
+    if (files && files[0]) {
+        const reader = new FileReader();
+        reader.onload = (f) => {
+            currentImageData = f.target.result; // ここで画像を文字データに変換
+            const img = document.createElement('img');
+            img.src = currentImageData;
+            img.id = 'previewImg';
+            img.style.maxWidth = '100px';
+            imagePreviews.appendChild(img);
+        };
+        reader.readAsDataURL(files[0]);
+    }
+};
+
+// 2. フォーム送信時に、画像を含めてLocalStorageに保存する
+document.getElementById('lotteryForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    // 入力データの取得
+    const newEntry = {
+        id: Date.now(),
+        stageName: document.getElementById('stageName').value,
+        image: currentImageData, // 変換した画像を保存
+        startDate: document.getElementById('lotteryStartDate').value,
+        endDate: document.getElementById('lotteryEndDate').value,
+        notes: document.getElementById('notes').value
+    };
+
+    // 既存のデータに追加
+    let lotteries = JSON.parse(localStorage.getItem('theaterLotteries')) || [];
+    lotteries.push(newEntry);
+    localStorage.setItem('theaterLotteries', JSON.stringify(lotteries));
+
+    alert('登録しました！');
+    location.reload();
+});
+
+// --- 以降、元々scriptファイルにあったリスト表示やカレンダーのコードをここに記述 ---
+// (※もし元のscriptファイルの内容が手元になければ、最小限の表示機能を補足します)
+</script>
 </body>
 </html>
